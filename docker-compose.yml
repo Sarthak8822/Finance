@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database for User Service
+  userdetails-db:
+    image: postgres:15
+    container_name: userdetails-db
+    environment:
+      POSTGRES_DB: userdetails_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGTZ: Asia/Kolkata
+
+    ports:
+      - "5432:5432"
+    volumes:
+      - userdetails-db-data:/var/lib/postgresql/data
+    networks:
+      - finance-network
+
+  # PostgreSQL Database for Transaction Service
+  transaction-db:
+    image: postgres:15
+    container_name: transaction-db
+    environment:
+      POSTGRES_DB: transaction_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGTZ: Asia/Kolkata
+    ports:
+      - "5433:5432"
+    volumes:
+      - transaction-db-data:/var/lib/postgresql/data
+    networks:
+      - finance-network
+
+  # PostgreSQL Database for Budget Service
+  budget-db:
+    image: postgres:15
+    container_name: budget-db
+    environment:
+      POSTGRES_DB: budget_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGTZ: Asia/Kolkata
+    ports:
+      - "5434:5432"
+    volumes:
+      - budget-db-data:/var/lib/postgresql/data
+    networks:
+      - finance-network
+
+volumes:
+  userdetails-db-data:
+  transaction-db-data:
+  budget-db-data:
+
+networks:
+  finance-network:
+    driver: bridge

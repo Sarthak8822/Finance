@@ -1,0 +1,31 @@
+# Eureka Service Configuration
+# Ye file Eureka Server ki settings define karti hai
+
+server:
+  port: 8761  # Eureka Server is port pe run hoga
+
+# Eureka Client Configuration
+eureka:
+  client:
+    # Ye service khud ek registry hai, to isse khud ko register karne ki zarurat nahi
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+  server:
+    # Wait time before removing a service (milliseconds)
+    eviction-interval-timer-in-ms: 5000
+    # Renewal threshold - percentage of services that should renew
+    renewal-percent-threshold: 0.85
+
+# Application name
+spring:
+  application:
+    name: eureka-service
+
+# Logging
+logging:
+  level:
+    com.netflix.eureka: INFO
+    com.netflix.discovery: INFO

@@ -1,0 +1,80 @@
+# API Gateway Configuration
+# Ye file define karti hai ki kaunsi request kaha route hogi
+
+server:
+  port: 8080  # Gateway is port pe run hoga
+
+spring:
+  application:
+    name: api-gateway
+
+  # Cloud Gateway Configuration
+  cloud:
+    gateway:
+      # Service discovery ke through route karna
+      discovery:
+        locator:
+          enabled: true  # Automatic service discovery enable
+          lower-case-service-id: true  # Service names lowercase mein
+
+      # Manual Routes Definition
+      # Har route define karta hai ki kaunsa path kis service ko jaye
+      routes:
+        # USER SERVICE ROUTES
+        - id: user-service
+          uri: lb://user-service  # lb = load balanced (Eureka se address lega)
+          predicates:
+            - Path=/api/users/**  # Agar path /api/users/** hai to USER-SERVICE pe jao
+          filters:
+            - StripPrefix=0  # Path ko waise hi bhejo
+
+        # TRANSACTION SERVICE ROUTES
+        - id: transaction-service
+          uri: lb://transaction-service
+          predicates:
+            - Path=/api/transactions/**
+          filters:
+            - StripPrefix=0
+
+        # BUDGET SERVICE ROUTES
+        - id: budget-service
+          uri: lb://budget-service
+          predicates:
+            - Path=/api/budgets/**
+          filters:
+            - StripPrefix=0
+
+        # REPORT SERVICE ROUTES
+        - id: report-service
+          uri: lb://report-service
+          predicates:
+            - Path=/api/reports/**
+          filters:
+            - StripPrefix=0
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/  # Eureka server address
+    register-with-eureka: true  # Khud ko Eureka pe register karo
+    fetch-registry: true  # Dusri services ki list lo
+
+  instance:
+    prefer-ip-address: true  # IP address use karo hostname ki jagah
+
+# Actuator endpoints (Health check ke liye)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty: INFO
