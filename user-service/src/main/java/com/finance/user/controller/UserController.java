@@ -2,7 +2,6 @@ package com.finance.user.controller;
 
 import com.finance.user.config.JwtUtil;
 import com.finance.user.dto.*;
-
 import com.finance.user.model.User;
 import com.finance.user.service.UserService;
 import jakarta.validation.Valid;
@@ -147,6 +146,68 @@ public class UserController {
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse(false, e.getMessage()));
+        }
+    }
+
+    /**
+     * Delete User Account
+     *
+     * DELETE /api/users/{userId}
+     * Header: Authorization: Bearer <token>
+     * CAUTION: This will permanently delete the user account
+     */
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+        try {
+            userService.deleteUser(userId);
+            return ResponseEntity.ok(new ApiResponse(
+                    true,
+                    "User account deleted successfully!"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse(false, e.getMessage()));
+        }
+    }
+
+    /**
+     * Deactivate User Account (Soft Delete)
+     *
+     * PUT /api/users/{userId}/deactivate
+     * Header: Authorization: Bearer <token>
+     * User account deactivate hoga but data delete nahi hoga
+     */
+    @PutMapping("/{userId}/deactivate")
+    public ResponseEntity<?> deactivateUser(@PathVariable Long userId) {
+        try {
+            userService.deactivateUser(userId);
+            return ResponseEntity.ok(new ApiResponse(
+                    true,
+                    "User account deactivated successfully!"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse(false, e.getMessage()));
+        }
+    }
+
+    /**
+     * Reactivate User Account
+     *
+     * PUT /api/users/{userId}/reactivate
+     * Header: Authorization: Bearer <token>
+     */
+    @PutMapping("/{userId}/reactivate")
+    public ResponseEntity<?> reactivateUser(@PathVariable Long userId) {
+        try {
+            userService.reactivateUser(userId);
+            return ResponseEntity.ok(new ApiResponse(
+                    true,
+                    "User account reactivated successfully!"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse(false, e.getMessage()));
         }
     }

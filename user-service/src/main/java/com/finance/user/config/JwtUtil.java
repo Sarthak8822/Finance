@@ -25,7 +25,7 @@ import java.util.Date;
 public class JwtUtil {
 
     // Secret key for signing JWT (production mein ye environment variable se aani chahiye)
-    @Value("${jwt.secret:mySecretKeyForJWTTokenGenerationFinanceTrackerApp12345}")
+    @Value("${jwt.secret}")
     private String jwtSecret;
 
     // Token expiration time (24 hours)

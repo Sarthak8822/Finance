@@ -73,7 +73,49 @@ public class TransactionService {
 
     @Transactional
     public void deleteTransaction(Long transactionId) {
+        // Check if transaction exists
+        if (!transactionRepository.existsById(transactionId)) {
+            throw new RuntimeException("Transaction not found with id: " + transactionId);
+        }
         transactionRepository.deleteById(transactionId);
+    }
+
+    /**
+     * Delete all transactions for a user
+     * CAUTION: This will delete all transactions permanently!
+     */
+    @Transactional
+    public void deleteAllTransactionsByUser(Long userId) {
+        List<Transaction> transactions = transactionRepository.findByUserId(userId);
+        if (transactions.isEmpty()) {
+            throw new RuntimeException("No transactions found for user id: " + userId);
+        }
+        transactionRepository.deleteAll(transactions);
+    }
+
+    /**
+     * Delete transactions by category for a user
+     */
+    @Transactional
+    public void deleteTransactionsByCategory(Long userId, String category) {
+        List<Transaction> transactions = transactionRepository.findByUserIdAndCategory(userId, category);
+        if (transactions.isEmpty()) {
+            throw new RuntimeException("No transactions found for category: " + category);
+        }
+        transactionRepository.deleteAll(transactions);
+    }
+
+    /**
+     * Delete transactions by date range
+     */
+    @Transactional
+    public void deleteTransactionsByDateRange(Long userId, LocalDate startDate, LocalDate endDate) {
+        List<Transaction> transactions = transactionRepository
+                .findByUserIdAndTransactionDateBetween(userId, startDate, endDate);
+        if (transactions.isEmpty()) {
+            throw new RuntimeException("No transactions found in the given date range");
+        }
+        transactionRepository.deleteAll(transactions);
     }
 
     private TransactionResponse convertToResponse(Transaction transaction) {

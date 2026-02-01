@@ -1,7 +1,7 @@
 # User Service Configuration
 
 server:
-  port: 8081  # User Service port
+  port: 8086  # User Service port
 
 spring:
   application:

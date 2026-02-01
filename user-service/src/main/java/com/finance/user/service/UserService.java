@@ -131,6 +131,43 @@ public class UserService {
     }
 
     /**
+     * Delete User (Hard Delete)
+     * CAUTION: This will permanently delete the user from database
+     */
+    @Transactional
+    public void deleteUser(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException("User not found with id: " + userId);
+        }
+        userRepository.deleteById(userId);
+    }
+
+    /**
+     * Deactivate User (Soft Delete)
+     * User data rahega but account inactive ho jayega
+     */
+    @Transactional
+    public void deactivateUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found!"));
+
+        user.setIsActive(false);
+        userRepository.save(user);
+    }
+
+    /**
+     * Reactivate User Account
+     */
+    @Transactional
+    public void reactivateUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found!"));
+
+        user.setIsActive(true);
+        userRepository.save(user);
+    }
+
+    /**
      * Helper method: Convert User entity to UserResponse DTO
      * Password ko response mein nahi bhejte (security)
      */

@@ -36,6 +36,38 @@ public class BudgetService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Delete budget by ID
+     */
+    public void deleteBudget(Long budgetId) {
+        if (!budgetRepository.existsById(budgetId)) {
+            throw new RuntimeException("Budget not found with id: " + budgetId);
+        }
+        budgetRepository.deleteById(budgetId);
+    }
+
+    /**
+     * Delete all budgets for a user
+     */
+    public void deleteAllBudgetsByUser(Long userId) {
+        List<Budget> budgets = budgetRepository.findByUserId(userId);
+        if (budgets.isEmpty()) {
+            throw new RuntimeException("No budgets found for user id: " + userId);
+        }
+        budgetRepository.deleteAll(budgets);
+    }
+
+    /**
+     * Delete budget by category for a specific user
+     */
+    public void deleteBudgetByCategory(Long userId, String category) {
+        List<Budget> budgets = budgetRepository.findByUserIdAndCategory(userId, category);
+        if (budgets.isEmpty()) {
+            throw new RuntimeException("No budget found for category: " + category);
+        }
+        budgetRepository.deleteAll(budgets);
+    }
+
     private BudgetResponse convertToResponse(Budget budget) {
         BigDecimal remaining = budget.getBudgetAmount().subtract(budget.getSpentAmount());
         String status = getStatus(budget.getSpentAmount(), budget.getBudgetAmount());
