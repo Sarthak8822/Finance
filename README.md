@@ -38,33 +38,33 @@ Ye ek complete **Finance Tracker Application** hai jo **Microservices Architectu
 - **Kaam:** User registration, login, profile management
 - **Database:** PostgreSQL (user_db)
 - **Endpoints:**
-    - POST /api/users/register
-    - POST /api/users/login
-    - GET /api/users/profile
+  - POST /api/users/register
+  - POST /api/users/login
+  - GET /api/users/profile
 
 ### 4. **Transaction Service** - Port 8082
 - **Kaam:** Income aur Expense transactions manage karta hai
 - **Database:** PostgreSQL (transaction_db)
 - **Endpoints:**
-    - POST /api/transactions (Add transaction)
-    - GET /api/transactions (Get all transactions)
-    - GET /api/transactions/summary (Get summary)
+  - POST /api/transactions (Add transaction)
+  - GET /api/transactions (Get all transactions)
+  - GET /api/transactions/summary (Get summary)
 
 ### 5. **Budget Service** - Port 8083
 - **Kaam:** Budget set karna aur track karna
 - **Database:** PostgreSQL (budget_db)
 - **Endpoints:**
-    - POST /api/budgets (Create budget)
-    - GET /api/budgets (Get all budgets)
-    - GET /api/budgets/alerts (Check budget alerts)
+  - POST /api/budgets (Create budget)
+  - GET /api/budgets (Get all budgets)
+  - GET /api/budgets/alerts (Check budget alerts)
 
 ### 6. **Report Service** - Port 8084
 - **Kaam:** Financial reports generate karta hai
 - **Features:** Monthly/Yearly reports, Charts data
 - **Endpoints:**
-    - GET /api/reports/monthly
-    - GET /api/reports/yearly
-    - GET /api/reports/category-wise
+  - GET /api/reports/monthly
+  - GET /api/reports/yearly
+  - GET /api/reports/category-wise
 
 ## Architecture Diagram 🎨
 
@@ -293,5 +293,4 @@ curl -X POST http://localhost:8080/api/budgets \
 
 ---
 
-**Happy Learning! 🚀**#   F i n a n c e  
- 
+**Happy Learning! 🚀**
