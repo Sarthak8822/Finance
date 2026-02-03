@@ -41,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/users/register",
                                 "/api/users/login",
+                                "/api/users/**",
                                 "/actuator/**"  // Health check endpoints
                         ).permitAll()
 

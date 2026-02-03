@@ -125,6 +125,15 @@ public class UserService {
         if (request.getPhoneNumber() != null) {
             user.setPhoneNumber(request.getPhoneNumber());
         }
+        if (request.getEmail() != null) {
+            user.setEmail(request.getEmail());
+        }
+        if (request.getUsername() != null) {
+            user.setUsername(request.getUsername());
+        }
+        if (request.getFullName() != null) {
+            user.setFullName(request.getFullName());
+        }
 
         User updatedUser = userRepository.save(user);
         return convertToUserResponse(updatedUser);
