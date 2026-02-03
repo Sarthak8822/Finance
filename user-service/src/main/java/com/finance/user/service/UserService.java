@@ -4,9 +4,12 @@ import com.finance.user.dto.*;
 import com.finance.user.model.User;
 import com.finance.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * User Service
@@ -25,6 +28,10 @@ public class UserService {
     // Dependencies
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;  // Password encrypt karne ke liye
+    private final RestTemplate restTemplate;
+
+    @Value("${services.transaction.base-url}")
+    private String transactionServiceBaseUrl;
 
     /**
      * User Registration
@@ -148,7 +155,17 @@ public class UserService {
         if (!userRepository.existsById(userId)) {
             throw new RuntimeException("User not found with id: " + userId);
         }
+        deleteUserTransactions(userId);
         userRepository.deleteById(userId);
+    }
+
+    private void deleteUserTransactions(Long userId) {
+        String url = transactionServiceBaseUrl + "/api/transactions/user/{userId}/all";
+        try {
+            restTemplate.delete(url, userId);
+        } catch (RestClientException ex) {
+            throw new RuntimeException("Failed to delete user transactions before removing user.", ex);
+        }
     }
 
     /**
