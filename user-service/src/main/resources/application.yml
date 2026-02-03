@@ -57,3 +57,7 @@ logging:
   level:
     com.finance.user: DEBUG
     org.springframework.security: DEBUG
+
+services:
+  transaction:
+    base-url: http://transaction-service
