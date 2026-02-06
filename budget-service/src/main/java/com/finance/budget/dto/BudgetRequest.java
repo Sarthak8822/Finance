@@ -14,4 +14,5 @@ public class BudgetRequest {
     private LocalDate startDate;
     private LocalDate endDate;
     private String period;
+    private BigDecimal spentAmount;
 }

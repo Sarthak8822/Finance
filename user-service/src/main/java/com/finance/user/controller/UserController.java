@@ -6,6 +6,7 @@ import com.finance.user.model.User;
 import com.finance.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
  * @RequestMapping - Base URL path
  * @RequiredArgsConstructor - Lombok (constructor injection)
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -160,13 +162,17 @@ public class UserController {
     @DeleteMapping("/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
         try {
-            userService.deleteUser(userId);
+            log.warn("🚨 DELETE request for user: {}", userId);
+
+            // Call cascade delete
+            userService.deleteUserWithCascade(userId);
+
             return ResponseEntity.ok(new ApiResponse(
                     true,
-                    "User account deleted successfully!"
+                    "User and all data deleted successfully!"
             ));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            return ResponseEntity.status(500)
                     .body(new ApiResponse(false, e.getMessage()));
         }
     }

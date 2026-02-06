@@ -4,9 +4,14 @@ import com.finance.user.dto.*;
 import com.finance.user.model.User;
 import com.finance.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 /**
  * User Service
@@ -18,11 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
  * @RequiredArgsConstructor - Lombok annotation (constructor automatically ban jata hai)
  * @Transactional - Database operations ko safely handle karta hai
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     // Dependencies
+    private final RestTemplate restTemplate;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;  // Password encrypt karne ke liye
 
@@ -174,6 +181,59 @@ public class UserService {
 
         user.setIsActive(true);
         userRepository.save(user);
+    }
+
+
+    /**
+     * CASCADE DELETE - Main Method
+     * Add this to your existing UserService.java
+     */
+    @Transactional
+    public void deleteUserWithCascade(Long userId) {
+        // Check user exists
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        log.warn("🚨 Deleting user: {} (ID: {})", user.getUsername(), userId);
+
+        try {
+            // Step 1: Find if Transactions Exists
+            String findTransUrl = "http://localhost:8082/api/transactions/user/"+ userId;
+            List<?> transaction = restTemplate.getForObject(findTransUrl, List.class);
+            if(transaction!=null && !transaction.isEmpty()){
+                // Step 2: Delete transactions
+                log.info("Deleting transactions...");
+                String transUrl = "http://localhost:8082/api/transactions/user/" + userId + "/all";
+                restTemplate.delete(transUrl);
+                log.info("✅ Transactions deleted");
+            }
+            else{
+                log.info("Transaction Delete Skipped");
+            }
+
+            // Step 1: Find if Budget Exists
+            String findBudgetUrl = "http://localhost:8082/api/budgets/user/"+ userId;
+            List<?> budget = restTemplate.getForObject(findTransUrl, List.class);
+
+            if(budget!=null && !budget.isEmpty()){
+                // Step 2: Delete budgets
+                log.info("Deleting budgets...");
+                String budgetUrl = "http://localhost:8083/api/budgets/user/" + userId + "/all";
+                restTemplate.delete(budgetUrl);
+                log.info("✅ Budgets deleted");
+            }
+            else{
+                log.info("Budget Deletion skipped");
+            }
+
+            // Step 3: Delete user
+            userRepository.deleteById(userId);
+            log.info("✅ User deleted");
+
+        } catch (Exception e) {
+            log.error("❌ Delete failed: {}", e.getMessage());
+            throw new RuntimeException("Failed to delete user: " + e.getMessage());
+        }
     }
 
     /**

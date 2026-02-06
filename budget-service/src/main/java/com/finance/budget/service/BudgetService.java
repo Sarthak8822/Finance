@@ -36,6 +36,25 @@ public class BudgetService {
                 .collect(Collectors.toList());
     }
 
+
+    /**
+     * Update Budget spentAmount
+     */
+    public BudgetResponse updateBudget(Long budgetId, BudgetRequest request) {
+        Budget budget = budgetRepository.findByBudgetId(budgetId);
+        budget.setBudgetAmount(request.getBudgetAmount());
+        budget.setCategory(request.getCategory());
+        budget.setStartDate(request.getStartDate());
+        budget.setSpentAmount(request.getSpentAmount());
+        budget.setEndDate(request.getEndDate());
+        budget.setPeriod(BudgetPeriod.valueOf(request.getPeriod().toUpperCase()));
+        budget.setSpentAmount(BigDecimal.ZERO);
+
+        Budget saved = budgetRepository.save(budget);
+        return convertToResponse(saved);
+    }
+
+
     /**
      * Delete budget by ID
      */
