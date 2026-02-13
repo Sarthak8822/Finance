@@ -4,6 +4,7 @@ import com.finance.transaction.dto.*;
 import com.finance.transaction.model.*;
 import com.finance.transaction.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TransactionService {
@@ -117,6 +119,40 @@ public class TransactionService {
         }
         transactionRepository.deleteAll(transactions);
     }
+
+    /**
+     * UPDATE TRANSACTION
+     *
+     * @param id - Transaction ID to update
+     * @param request - Updated transaction data
+     * @return Updated transaction
+     */
+    @Transactional
+    public Transaction updateTransaction(Long id, TransactionRequest request) {
+        // Find existing transaction
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transaction not found with ID: " + id));
+
+        log.info("Updating transaction: {} -> Amount: {} -> {}",
+                id, transaction.getAmount(), request.getAmount());
+
+        // Update fields
+        transaction.setAmount(request.getAmount());
+        transaction.setType(TransactionType.valueOf(request.getType()));
+        transaction.setCategory(request.getCategory());
+        transaction.setDescription(request.getDescription());
+        transaction.setTransactionDate(request.getTransactionDate());
+        transaction.setPaymentMethod(PaymentMethod.valueOf(request.getPaymentMethod()));
+
+        // Save updated transaction
+        Transaction updated = transactionRepository.save(transaction);
+
+        log.info("Transaction updated successfully: {}", updated.getId());
+
+        return updated;
+    }
+    
+
 
     private TransactionResponse convertToResponse(Transaction transaction) {
         return new TransactionResponse(

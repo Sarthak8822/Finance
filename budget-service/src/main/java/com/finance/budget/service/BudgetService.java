@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,22 +39,36 @@ public class BudgetService {
 
 
     /**
+     * Delete budget by ID
+     */
+
+    public Optional<Budget> getBudgetById(Long budgetId){
+        Optional<Budget> budget = Optional.ofNullable(budgetRepository.findById(budgetId).orElseThrow(() -> new RuntimeException("Budget not found")));
+
+
+        return budget;
+
+
+    }
+
+    /**
      * Update Budget spentAmount
      */
     public BudgetResponse updateBudget(Long budgetId, BudgetRequest request) {
-        Budget budget = budgetRepository.findByBudgetId(budgetId);
-        budget.setBudgetAmount(request.getBudgetAmount());
-        budget.setCategory(request.getCategory());
-        budget.setStartDate(request.getStartDate());
-        budget.setSpentAmount(request.getSpentAmount());
-        budget.setEndDate(request.getEndDate());
-        budget.setPeriod(BudgetPeriod.valueOf(request.getPeriod().toUpperCase()));
-        budget.setSpentAmount(BigDecimal.ZERO);
+        Budget budget = budgetRepository.findById(budgetId).orElseThrow(() -> new RuntimeException("Budget not found!"));;
 
-        Budget saved = budgetRepository.save(budget);
+            budget.setBudgetAmount(request.getBudgetAmount());
+            budget.setCategory(request.getCategory());
+            budget.setStartDate(request.getStartDate());
+            budget.setSpentAmount(request.getSpentAmount());
+            budget.setEndDate(request.getEndDate());
+            budget.setPeriod(BudgetPeriod.valueOf(request.getPeriod().toUpperCase()));
+            budget.setSpentAmount(BigDecimal.ZERO);
+
+            Budget saved = budgetRepository.save(budget);
+
         return convertToResponse(saved);
     }
-
 
     /**
      * Delete budget by ID

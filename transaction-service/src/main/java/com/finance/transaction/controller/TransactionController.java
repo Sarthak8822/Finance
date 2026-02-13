@@ -1,16 +1,20 @@
 package com.finance.transaction.controller;
 
 import com.finance.transaction.dto.*;
+import com.finance.transaction.model.Transaction;
 import com.finance.transaction.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/transactions")
 @RequiredArgsConstructor
@@ -122,10 +126,55 @@ public class TransactionController {
         }
     }
 
+
+    /**
+     * UPDATE TRANSACTION
+     *
+     * PUT /api/transactions/{id}
+     *
+     * Request Body:
+     * {
+     *   "userId": 1,
+     *   "amount": 500.0,
+     *   "type": "EXPENSE",
+     *   "category": "Food",
+     *   "description": "Updated description",
+     *   "transactionDate": "2024-01-15",
+     *   "paymentMethod": "UPI"
+     * }
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTransaction(
+            @PathVariable Long id,
+            @RequestBody TransactionRequest request) {
+        try {
+            log.info("Updating transaction ID: {}", id);
+
+            Transaction updated = transactionService.updateTransaction(id, request);
+
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            log.error("Error updating transaction: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+
+
+
+
+
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {
         return ResponseEntity.ok("Transaction Service is running!");
     }
+
+
+
+
+
+
 
     /**
      * API Response Helper Class

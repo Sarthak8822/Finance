@@ -38,11 +38,12 @@ public class BudgetController {
             budgetService.deleteBudget(budgetId);
             return ResponseEntity.ok(new ApiResponse(
                     true,
-                    "Budget deleted successfully!"
+                    "Budget deleted successfully!",
+                    budgetService.getBudgetById(budgetId)
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse(false, e.getMessage()));
+                    .body(new ApiResponse(false, e.getMessage(), budgetService.getBudgetById(budgetId)));
         }
     }
 
@@ -58,11 +59,12 @@ public class BudgetController {
             budgetService.deleteAllBudgetsByUser(userId);
             return ResponseEntity.ok(new ApiResponse(
                     true,
-                    "All budgets deleted successfully!"
+                    "All budgets deleted successfully!",
+                    budgetService.getAllBudgets(userId)
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse(false, e.getMessage()));
+                    .body(new ApiResponse(false, e.getMessage(), budgetService.getAllBudgets(userId)));
         }
     }
 
@@ -80,11 +82,30 @@ public class BudgetController {
             budgetService.deleteBudgetByCategory(userId, category);
             return ResponseEntity.ok(new ApiResponse(
                     true,
-                    "Budget for category '" + category + "' deleted successfully!"
+                    "Budget for category '" + category + "' deleted successfully!",
+                    budgetService.getAllBudgets(userId)
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse(false, e.getMessage()));
+                    .body(new ApiResponse(false, e.getMessage(), budgetService.getAllBudgets(userId)));
+        }
+    }
+
+
+    @PutMapping("/{budgetId}")
+    public ResponseEntity<?> updateBudget(
+            @PathVariable Long budgetId,
+            @RequestBody BudgetRequest request
+    ){
+        try {
+            BudgetResponse budget = budgetService.updateBudget(budgetId, request);
+            return ResponseEntity.ok(new ApiResponse(
+                    true,
+                    "Budget updated successfully!",
+                    budget
+            ));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -99,13 +120,16 @@ public class BudgetController {
     private static class ApiResponse {
         private Boolean success;
         private String message;
+        private Object object;
 
-        public ApiResponse(Boolean success, String message) {
+        public ApiResponse(Boolean success, String message, Object object) {
             this.success = success;
             this.message = message;
+            this.object = object;
         }
 
         public Boolean getSuccess() { return success; }
         public String getMessage() { return message; }
+        public Object getObject() { return object; }
     }
 }
